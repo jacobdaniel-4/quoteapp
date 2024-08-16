@@ -11,19 +11,37 @@ def get_random_quote():
     else:
         return None
 
-# Possible "correct" authors, for simplicity we'll assume 'Donald Trump' and 'Crazy Guy'
+# Function to get a random quote by Donald Trump (from a hypothetical Trump Quotes API)
+def get_trump_quote():
+    # Hypothetical API for Trump quotes (replace this with a real API if available)
+    response = requests.get("https://trump-quote-api.com/random")
+    if response.status_code == 200:
+        data = response.json()
+        return {"quote": data['quote'], "author": "Donald Trump"}
+    else:
+        return None
+
+# Possible "correct" authors, including Donald Trump and Crazy Guy
 fake_authors = ["Donald Trump", "Crazy Guy"]
 
 # Function to label authors randomly as either Donald Trump or Crazy Guy
 def assign_fake_author(author_name):
-    if random.choice([True, False]):
-        return fake_authors[0]  # Donald Trump
+    # 50% chance for Donald Trump, otherwise "Crazy Guy"
+    if random.random() < 0.5:
+        return "Donald Trump"
     else:
-        return fake_authors[1]  # Crazy Guy
+        return "Crazy Guy"
+
+# Function to randomly choose between fetching a Trump quote or a random quote
+def get_random_or_trump_quote():
+    if random.random() < 0.5:
+        return get_trump_quote()
+    else:
+        return get_random_quote()
 
 # Initial setup for state management
 if "quote_data" not in st.session_state:
-    st.session_state.quote_data = get_random_quote()
+    st.session_state.quote_data = get_random_or_trump_quote()
     st.session_state.fake_author = assign_fake_author(st.session_state.quote_data["author"])
     st.session_state.show_result = False
 
@@ -50,6 +68,6 @@ if st.button("Submit Guess"):
 # Option to get a new quote
 if st.session_state.show_result:
     if st.button("New Quote"):
-        st.session_state.quote_data = get_random_quote()
+        st.session_state.quote_data = get_random_or_trump_quote()
         st.session_state.fake_author = assign_fake_author(st.session_state.quote_data["author"])
         st.session_state.show_result = False
